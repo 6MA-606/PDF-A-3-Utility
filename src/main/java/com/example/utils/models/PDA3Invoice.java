@@ -18,11 +18,15 @@ public class PDA3Invoice extends PDA3Document {
 
         this.invoice = invoice;
 
-        initialize();
+        this.createInvoicePage();
+        this.attachXml();
     }
 
-    private void initialize() throws IOException {
-        this.createInvoicePage();
+    public PDA3Invoice(Invoice invoice, String templatePath) throws IOException {
+        super(templatePath);
+
+        this.invoice = invoice;
+
         this.attachXml();
     }
 
@@ -59,5 +63,15 @@ public class PDA3Invoice extends PDA3Document {
         } catch (Exception e) {
             throw new IOException("Error attaching XML file", e);
         }
+    }
+
+    public void saveToFile(String filePath, String fileName) throws IOException {
+        if (filePath == null || filePath.isEmpty()) {
+            throw new IllegalArgumentException("File path cannot be null or empty");
+        }
+        if (fileName == null || fileName.isEmpty()) {
+            fileName = "invoice-" + this.invoice.getInvoiceNumber() + ".pdf";
+        }
+        this.save(filePath + "/" + fileName);
     }
 }

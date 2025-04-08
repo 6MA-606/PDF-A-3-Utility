@@ -1,6 +1,7 @@
 package com.example.utils.models;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,9 +9,13 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentNameDictionary;
 import org.apache.pdfbox.pdmodel.PDEmbeddedFilesNameTreeNode;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageTree;
+import org.apache.pdfbox.pdmodel.common.PDStream;
 import org.apache.pdfbox.pdmodel.common.filespecification.PDComplexFileSpecification;
 import org.apache.pdfbox.pdmodel.common.filespecification.PDEmbeddedFile;
 
@@ -20,6 +25,31 @@ public class PDA3Document extends PDDocument {
 
     public PDA3Document() throws IOException {
         super();
+        PDA3Utils utils = new PDA3Utils();
+        utils.addPDA3Metadata(this);
+    }
+
+    // TODO: Add a constructor that takes a template PDF file and copies its pages to the new document
+    public PDA3Document(String templatePath) throws IOException {
+        super();
+        try {
+            PDDocument templatePDF = Loader.loadPDF(new File(templatePath));
+            PDPageTree pageTree = templatePDF.getPages();
+            pageTree.forEach(page -> {
+                PDPage newPage = new PDPage(page.getMediaBox());
+                newPage.setResources(page.getResources());
+
+                // // Read the source page content stream and wrap it in a PDStream
+                // try (InputStream contents = page.getContents()) {
+                //     PDStream stream = new PDStream(this, contents); // `this` is your PDDocument
+                //     newPage.setContents(stream); 
+                // } // Critical line
+                // this.addPage(newPage);
+            });
+            templatePDF.close();
+        } catch (Exception e) {
+            throw new IOException("Error loading template: " + e.getMessage(), e);
+        }
         PDA3Utils utils = new PDA3Utils();
         utils.addPDA3Metadata(this);
     }

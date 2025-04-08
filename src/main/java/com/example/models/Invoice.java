@@ -2,7 +2,9 @@ package com.example.models;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import com.example.exceptions.XmlConversionException;
 import com.example.utils.XmlUtils;
@@ -19,9 +21,21 @@ import lombok.Setter;
 public class Invoice {
     private String invoiceNumber;
     private Date date = null;
+    private List<String> items = new ArrayList<>();
+
+    public void pushItem(String item) {
+        if (item == null || item.isEmpty()) {
+            throw new IllegalArgumentException("Item cannot be null or empty");
+        }
+        items.add(item);
+    }
 
     public PDA3Invoice toPDA3Invoice() throws IOException {
         return new PDA3Invoice(this);
+    }
+
+    public PDA3Invoice toPDA3Invoice(String templatePath) throws IOException {
+        return new PDA3Invoice(this, templatePath);
     }
 
     public String toXmlString() throws XmlConversionException {

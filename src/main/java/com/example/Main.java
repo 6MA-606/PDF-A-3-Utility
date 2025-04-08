@@ -11,6 +11,7 @@ public class Main {
 
         Invoice invoice = mapper.readValue(System.in, Invoice.class);
         PDA3Invoice pda3Invoice = invoice.toPDA3Invoice();
+
         pda3Invoice.save("invoice.pdf");
     }
 

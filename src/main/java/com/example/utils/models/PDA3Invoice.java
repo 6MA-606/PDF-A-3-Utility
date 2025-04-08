@@ -1,41 +1,32 @@
 package com.example.utils.models;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 
+import com.example.models.Invoice;
+
 public class PDA3Invoice extends PDA3Document {
     
-    private String invoiceNumber;
-    private String formattedDate;
+    private Invoice invoice;
     
-    public PDA3Invoice(String invoiceNumber, Date date) throws IOException {
+    public PDA3Invoice(Invoice invoice) throws IOException {
         super();
-        if (invoiceNumber == null || invoiceNumber.isEmpty()) {
-            throw new IllegalArgumentException("Invoice number cannot be null or empty");
-        }
-        this.invoiceNumber = invoiceNumber;
-        
-        SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
-        this.formattedDate = sdf.format(date);
-        
+
+        this.invoice = invoice;
+
         initialize();
     }
 
-    public PDA3Invoice(String invoiceNumber) throws IOException {
-        this(invoiceNumber, new Date());
-    }
-
     private void initialize() throws IOException {
-        addInvoicePage();
+        this.createInvoicePage();
+        this.attachXml();
     }
 
-    public void addInvoicePage() throws IOException {
+    private void createInvoicePage() throws IOException {
         PDPage page = new PDPage(PDRectangle.A4);
         this.addPage(page);
 
@@ -46,14 +37,27 @@ public class PDA3Invoice extends PDA3Document {
         contentWriter.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA));
         contentWriter.setFontSize(12);
         contentWriter.writeText("NO.", 460, (842 - 57));
-        contentWriter.writeText(invoiceNumber, 485, (842 - 57));
+        contentWriter.writeText(this.invoice.getInvoiceNumber(), 485, (842 - 57));
         contentWriter.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD));
         contentWriter.setFontSize(12);
 
         contentWriter.writeText("Date:", 60, (842 - 106));
         contentWriter.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA));
-        contentWriter.writeText(formattedDate, 100, (842 - 106));
+        contentWriter.writeText(this.invoice.getDate(), 100, (842 - 106));
 
         contentWriter.close();
+    }
+
+    private void attachXml() throws IOException {
+
+        try {
+            String xmlString = this.invoice.toXmlString();
+            String fileName = "invoice.xml";
+            String mimeType = "text/xml";
+    
+            this.attachText(xmlString, fileName, mimeType);
+        } catch (Exception e) {
+            throw new IOException("Error attaching XML file", e);
+        }
     }
 }

@@ -9,18 +9,26 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 
-public class Invoice extends PDA3Document {
+public class PDA3Invoice extends PDA3Document {
     
     private String invoiceNumber;
-
-    public Invoice(String invoiceNumber) throws IOException {
+    private String formattedDate;
+    
+    public PDA3Invoice(String invoiceNumber, Date date) throws IOException {
         super();
         if (invoiceNumber == null || invoiceNumber.isEmpty()) {
             throw new IllegalArgumentException("Invoice number cannot be null or empty");
         }
         this.invoiceNumber = invoiceNumber;
-
+        
+        SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
+        this.formattedDate = sdf.format(date);
+        
         initialize();
+    }
+
+    public PDA3Invoice(String invoiceNumber) throws IOException {
+        this(invoiceNumber, new Date());
     }
 
     private void initialize() throws IOException {
@@ -42,9 +50,6 @@ public class Invoice extends PDA3Document {
         contentWriter.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD));
         contentWriter.setFontSize(12);
 
-        Date today = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
-        String formattedDate = sdf.format(today);
         contentWriter.writeText("Date:", 60, (842 - 106));
         contentWriter.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA));
         contentWriter.writeText(formattedDate, 100, (842 - 106));

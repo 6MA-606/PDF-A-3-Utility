@@ -49,7 +49,7 @@ public class PDA3Document extends PDDocument {
             fileSpec.setFile(fileNameInDocument);
             fileSpec.setEmbeddedFile(embeddedFile);
 
-            Map<String, PDComplexFileSpecification> embeddedFileMap = new HashMap<String, PDComplexFileSpecification>();
+            Map<String, PDComplexFileSpecification> embeddedFileMap = new HashMap<>();
             embeddedFileMap.put(fileNameInDocument, fileSpec);
 
             PDEmbeddedFilesNameTreeNode fileSpecTree = new PDEmbeddedFilesNameTreeNode();

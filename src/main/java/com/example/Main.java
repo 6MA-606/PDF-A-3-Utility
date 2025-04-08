@@ -1,23 +1,17 @@
 package com.example;
 
-import java.io.IOException;
-
-import com.example.utils.models.Invoice;
+import com.example.models.Invoice;
+import com.example.utils.models.PDA3Invoice;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
 
-        Invoice invoice = new Invoice("123456");
-        try {
-            invoice.addInvoicePage();
-            invoice.attachFile("./invoice.xml", "invoice.xml", "application/xml");
-            // invoice.attachFile("./invoice.mp4", "invoice.mp4", "video/mp4");
-            // invoice.attachFile("./invoice.sh", "invoice.ps1", "text/plain");
-            invoice.save("Invoice.pdf");
-            invoice.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Invoice invoice = mapper.readValue(System.in, Invoice.class);
+        PDA3Invoice pda3Invoice = invoice.toPDA3Invoice();
+        pda3Invoice.save("invoice.pdf");
     }
+
 }
